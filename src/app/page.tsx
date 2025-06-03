@@ -1,12 +1,18 @@
 import Link from "next/link";
 import Script from "next/script";
+import { type Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Premium Auto Sales",
+  description: "Your trusted partner in finding the perfect vehicle",
+};
 
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Section */}
       <div className="relative h-[600px] bg-gradient-to-r from-gray-900 to-gray-800">
-        <div className="absolute inset-0 bg-[url('/hero-car.jpg')] bg-cover bg-center opacity-50" />
+        <div className="absolute inset-0 bg-[url('/hero-car.jpg')] bg-cover bg-center opacity-50 transform scale-110" />
         <div className="relative container mx-auto px-4 h-full flex flex-col justify-center">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
             Premium Auto Sales
