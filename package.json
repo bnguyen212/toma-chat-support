@@ -19,7 +19,8 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "build:widget": "webpack --config webpack.widget.config.js"
+    "build:widget": "webpack --config webpack.widget.config.js",
+    "watch:widget": "webpack --config webpack.widget.config.js --watch"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
