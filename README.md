@@ -1,29 +1,120 @@
-# Create T3 App
+# Toma Chat
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+A customer support chat widget for automotive dealerships, built with Next.js, Prisma, and Together AI. The widget provides intelligent customer service with AI-powered responses and seamless handoff to human agents when needed.
 
-## What's next? How do I make an app with this?
+## Features
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- Real-time chat interface with typing indicators
+- Conversation history tracking and context awareness
+- Structured customer information collection for service bookings
+- Intelligent AI responses with Together AI
+- Seamless fallback to human agents
+- Domain-based security
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Prerequisites
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+- Node.js (v18 or higher)
+- npm or yarn
+- PostgreSQL database
+- Together AI API key
 
-## Learn More
+## Getting Started
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/bnguyen212/toma-chat-support.git
+   cd toma-chat-support
+   ```
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+3. **Set up environment variables**
+   Create a `.env` file in the root directory with the following variables:
+   ```
+   DATABASE_URL="postgresql://username:password@localhost:5432/toma_chat"
+   TOGETHER_API_KEY="your-together-ai-api-key"
+   ```
 
-## How do I deploy this?
+4. **Set up the database**
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+5. **Run the development server**
+   ```bash
+   # Terminal 1: Run Next.js development server
+   npm run dev
+   # or
+   yarn dev
+
+   # Terminal 2: Run widget watcher for development
+   npm run watch:widget
+   # or
+   yarn watch:widget
+   ```
+
+6. **Build for production**
+   ```bash
+   # Build the Next.js app and widget bundle
+   npm run build
+   # or
+   yarn build
+
+   # The build process will:
+   # 1. Build the Next.js application
+   # 2. Generate the widget bundle in public/chat-widget.js
+   # 3. Generate the widget styles in public/chat-widget.css
+   ```
+
+## Usage
+
+**Embed the chat widget**
+   Add the following script to your website:
+   ```html
+   <script src="<host>/chat-widget.js"></script>
+   <script>
+     TomaChat.init({
+       customerDomain: 'your-dealership-domain.com'  // Must be an authorized domain
+     });
+   </script>
+   ```
+
+## Development
+
+- **Frontend**:
+  - Next.js with TypeScript
+  - React for UI components
+  - CSS Modules for styling
+- **Backend**:
+  - Next.js API routes
+  - Prisma ORM for database operations
+  - Together AI for natural language processing
+- **Database**:
+  - PostgreSQL
+  - Conversation and message history storage
+- **Security**:
+  - Domain-based authentication
+  - Secure API endpoints
+  - Environment variable protection
+
+## Project Structure
+
+```
+toma-chat/
+├── prisma/              # Database schema and migrations
+├── public/             # Static assets and widget bundle
+├── src/
+│   ├── app/           # Next.js app directory
+│   │   └── api/       # API routes for chat and authentication
+│   ├── components/    # React components
+│   │   └── ChatWidget.tsx  # Main chat interface
+│   └── widget/        # Widget initialization and bundling
+├── .env               # Environment variables
+└── package.json       # Project dependencies
+```
