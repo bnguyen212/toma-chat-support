@@ -6,7 +6,7 @@ import { ChatWidget } from '../components/ChatWidget';
 interface WidgetConfig {
   containerId: string;
   apiUrl: string;
-  customerId?: string;
+  customerDomain?: string;
   theme?: {
     primaryColor?: string;
   };
@@ -17,7 +17,7 @@ declare global {
   interface Window {
     initChatWidget: (config: WidgetConfig) => void;
     CHAT_WIDGET_CONFIG?: {
-      customerId: string;
+      customerDomain: string;
     };
   }
 }
@@ -34,7 +34,7 @@ window.initChatWidget = (config: WidgetConfig) => {
     <React.StrictMode>
       <ChatWidget
         apiUrl={config.apiUrl}
-        customerId={config.customerId}
+        customerDomain={config.customerDomain}
         theme={config.theme}
       />
     </React.StrictMode>

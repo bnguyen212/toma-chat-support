@@ -10,11 +10,16 @@ interface Message {
 
 interface ApiResponse {
   response: string;
+  conversationId: string;
+}
+
+interface ApiError {
+  error: string;
 }
 
 interface ChatWidgetProps {
   apiUrl?: string;
-  customerId?: string;
+  customerDomain?: string;
   theme?: {
     primaryColor?: string;
   };
@@ -22,7 +27,7 @@ interface ChatWidgetProps {
 
 export const ChatWidget: React.FC<ChatWidgetProps> = ({
   apiUrl = '/api/chat',
-  customerId,
+  customerDomain,
   theme
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,6 +41,10 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
     }));
   });
   const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(() => {
+    return localStorage.getItem('chatConversationId');
+  });
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -65,6 +74,12 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
   }, [messages]);
 
   useEffect(() => {
+    if (conversationId) {
+      localStorage.setItem('chatConversationId', conversationId);
+    }
+  }, [conversationId]);
+
+  useEffect(() => {
     if (theme?.primaryColor) {
       document.documentElement.style.setProperty('--primary-color', theme.primaryColor);
     }
@@ -85,7 +100,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -96,29 +111,36 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
 
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
+    setIsLoading(true);
 
     try {
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Customer-ID': customerId ?? '',
         },
         body: JSON.stringify({
           message: inputValue,
-          customerId,
+          customerDomain,
+          conversationId,
         }),
       });
 
+      const data = await response.json() as ApiResponse | ApiError;
+
       if (!response.ok) {
-        throw new Error('Failed to send message');
+        throw new Error('error' in data ? data.error : 'Sorry, there was an error sending your message. Please try again.');
       }
 
-      const data = await response.json() as ApiResponse;
+      const apiResponse = data as ApiResponse;
+
+      if (apiResponse.conversationId && !conversationId) {
+        setConversationId(apiResponse.conversationId);
+      }
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response ?? 'Sorry, I could not process your message.',
+        content: apiResponse.response,
         sender: 'bot',
         timestamp: new Date(),
       };
@@ -128,11 +150,13 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
       console.error('Failed to send message:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: 'Sorry, there was an error sending your message. Please try again.',
+        content: error instanceof Error ? error.message : 'Sorry, there was an error sending your message. Please try again.',
         sender: 'bot',
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -172,6 +196,18 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
                 </div>
               </div>
             ))}
+            {isLoading && (
+              <div className={`${styles.message} ${styles.botMessage}`}>
+                <div className={styles.messageIcon}>👨‍💼</div>
+                <div className={styles.messageContent}>
+                  <div className={styles.typingIndicator}>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleSendMessage} className={styles.inputContainer}>
@@ -182,7 +218,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
               placeholder="Type your message..."
               className={styles.input}
             />
-            <button type="submit" className={styles.sendButton}>
+            <button type="submit" className={styles.sendButton} disabled={isLoading}>
               Send
             </button>
           </form>
