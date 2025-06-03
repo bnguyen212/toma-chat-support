@@ -26,7 +26,7 @@
       window.initChatWidget({
         containerId: widgetId,
         apiUrl: '/api/chat',
-        customerId: customerDomain,
+        customerDomain,
         theme: {
           primaryColor: '#007bff'
         }
