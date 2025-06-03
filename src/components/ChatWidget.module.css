@@ -64,7 +64,7 @@
 
 .messagesContainer {
   flex: 1;
-  padding: 16px;
+  padding: 16px 16px 16px 48px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -72,25 +72,74 @@
 }
 
 .message {
-  max-width: 80%;
-  padding: 12px 16px;
+  padding: 8px 12px;
+  margin: 4px 0;
   border-radius: 12px;
+  max-width: 80%;
+  word-wrap: break-word;
+  position: relative;
+}
+
+.messageIcon {
+  position: absolute;
+  left: -32px;
+  top: -10px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-color);
+  color: white;
   font-size: 14px;
-  line-height: 1.4;
+}
+
+.messageContent {
+  display: block;
+}
+
+.messageTimestamp {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 4px;
+  text-align: right;
+}
+
+.userMessage .messageTimestamp {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.botMessage .messageTimestamp {
+  color: rgba(0, 0, 0, 0.6);
 }
 
 .userMessage {
+  align-self: flex-end;
   background-color: var(--primary-color);
   color: white;
-  align-self: flex-end;
-  border-bottom-right-radius: 4px;
+  margin-left: auto;
 }
 
 .botMessage {
-  background-color: #f0f2f5;
-  color: #1c1e21;
   align-self: flex-start;
-  border-bottom-left-radius: 4px;
+  background-color: #f0f0f0;
+  color: #333;
+  margin-right: auto;
+  border-top-left-radius: 0;
+  position: relative;
+}
+
+.botMessage::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-top: 8px solid #f0f0f0;
+  border-left: 8px solid transparent;
 }
 
 .inputContainer {
