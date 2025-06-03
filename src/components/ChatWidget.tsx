@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './ChatWidget.module.css';
 
 interface Message {
@@ -6,6 +6,10 @@ interface Message {
   content: string;
   sender: 'user' | 'bot';
   timestamp: Date;
+}
+
+interface ApiResponse {
+  response: string;
 }
 
 interface ChatWidgetProps {
@@ -22,10 +26,60 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
   theme
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const savedMessages = localStorage.getItem('chatMessages');
+    if (!savedMessages) return [];
+    const parsed = JSON.parse(savedMessages) as (Omit<Message, 'timestamp'> & { timestamp: string })[];
+    return parsed.map(msg => ({
+      ...msg,
+      timestamp: new Date(msg.timestamp)
+    }));
+  });
   const [inputValue, setInputValue] = useState('');
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      }
+    }, 0);
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    if (isOpen) {
+      scrollToBottom();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const messagesToSave = messages.map(msg => ({
+      ...msg,
+      timestamp: msg.timestamp.toISOString()
+    }));
+    localStorage.setItem('chatMessages', JSON.stringify(messagesToSave));
+  }, [messages]);
+
+  useEffect(() => {
+    if (theme?.primaryColor) {
+      document.documentElement.style.setProperty('--primary-color', theme.primaryColor);
+    }
+  }, [theme]);
 
   const toggleChat = () => {
+    if (!isOpen && messages.length === 0) {
+      const welcomeMessage: Message = {
+        id: Date.now().toString(),
+        content: "Hello, how can I assist you today?",
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      setMessages([welcomeMessage]);
+    }
     setIsOpen(!isOpen);
   };
 
@@ -40,16 +94,15 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setInputValue('');
 
     try {
-      // Send message to API with customer ID
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Customer-ID': customerId || '',
+          'X-Customer-ID': customerId ?? '',
         },
         body: JSON.stringify({
           message: inputValue,
@@ -61,35 +114,27 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
         throw new Error('Failed to send message');
       }
 
-      const data = await response.json();
+      const data = await response.json() as ApiResponse;
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response || 'Sorry, I could not process your message.',
+        content: data.response ?? 'Sorry, I could not process your message.',
         sender: 'bot',
         timestamp: new Date(),
       };
 
-      setMessages((prev) => [...prev, botMessage]);
+      setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error('Failed to send message:', error);
-      // Show error message to user
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: 'Sorry, there was an error sending your message. Please try again.',
         sender: 'bot',
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages(prev => [...prev, errorMessage]);
     }
   };
-
-  // Apply theme if provided
-  useEffect(() => {
-    if (theme?.primaryColor) {
-      document.documentElement.style.setProperty('--primary-color', theme.primaryColor);
-    }
-  }, [theme]);
 
   return (
     <div className={styles.widgetContainer}>
@@ -108,7 +153,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
             </button>
           </div>
 
-          <div className={styles.messagesContainer}>
+          <div className={styles.messagesContainer} ref={messagesContainerRef}>
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -116,7 +161,15 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
                   message.sender === 'user' ? styles.userMessage : styles.botMessage
                 }`}
               >
-                {message.content}
+                {message.sender === 'bot' && (
+                  <div className={styles.messageIcon}>👨‍💼</div>
+                )}
+                <div className={styles.messageContent}>
+                  {message.content}
+                  <div className={styles.messageTimestamp}>
+                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
