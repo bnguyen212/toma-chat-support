@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "outDir": "./public",
+    "plugins": [],
+    "typeRoots": ["./node_modules/@types", "./src/types"]
+  },
+  "include": ["src/widget/**/*", "src/components/ChatWidget.tsx", "src/types/**/*"],
+  "exclude": ["node_modules"]
+}
