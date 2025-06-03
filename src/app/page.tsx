@@ -1,37 +1,118 @@
 import Link from "next/link";
+import Script from "next/script";
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-        <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-          Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-        </h1>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/usage/first-steps"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">First Steps →</h3>
-            <div className="text-lg">
-              Just the basics - Everything you need to know to set up your
-              database and authentication.
-            </div>
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">Documentation →</h3>
-            <div className="text-lg">
-              Learn more about Create T3 App, the libraries it uses, and how to
-              deploy it.
-            </div>
-          </Link>
+    <main className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <div className="relative h-[600px] bg-gradient-to-r from-gray-900 to-gray-800">
+        <div className="absolute inset-0 bg-[url('/hero-car.jpg')] bg-cover bg-center opacity-50" />
+        <div className="relative container mx-auto px-4 h-full flex flex-col justify-center">
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
+            Premium Auto Sales
+          </h1>
+          <p className="text-xl text-white mb-8">
+            Your trusted partner in finding the perfect vehicle
+          </p>
+          <button className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-blue-700 transition-colors w-fit">
+            Browse Inventory
+          </button>
         </div>
       </div>
+
+      {/* Featured Cars Section */}
+      <div className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-gray-900 mb-8">Featured Vehicles</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[1, 2, 3].map((car) => (
+            <div key={car} className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="h-48 bg-gray-200" />
+              <div className="p-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  {car === 1 ? "2024 BMW X5" : car === 2 ? "2023 Mercedes C-Class" : "2024 Audi Q7"}
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  {car === 1
+                    ? "Luxury SUV with premium features"
+                    : car === 2
+                    ? "Elegant sedan with advanced technology"
+                    : "Spacious SUV with exceptional comfort"}
+                </p>
+                <div className="flex justify-between items-center">
+                  <span className="text-2xl font-bold text-blue-600">
+                    ${car === 1 ? "65,000" : car === 2 ? "45,000" : "58,000"}
+                  </span>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                    View Details
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Services Section */}
+      <div className="bg-gray-100 py-16">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">Our Services</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {[
+              { title: "New Cars", desc: "Latest models from top manufacturers" },
+              { title: "Used Cars", desc: "Quality pre-owned vehicles" },
+              { title: "Financing", desc: "Competitive rates and flexible terms" },
+              { title: "Service", desc: "Expert maintenance and repairs" },
+            ].map((service, index) => (
+              <div key={index} className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{service.title}</h3>
+                <p className="text-gray-600">{service.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-xl font-bold mb-4">Premium Auto Sales</h3>
+              <p className="text-gray-400">
+                Your trusted partner in finding the perfect vehicle since 1995.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+              <ul className="space-y-2">
+                <li><Link href="#" className="text-gray-400 hover:text-white">Inventory</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white">Financing</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white">Service</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white">About Us</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Contact</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>123 Auto Drive</li>
+                <li>Car City, CA 90210</li>
+                <li>Phone: (555) 123-4567</li>
+                <li>Email: info@premiumauto.com</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Hours</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>Monday - Friday: 9am - 8pm</li>
+                <li>Saturday: 10am - 6pm</li>
+                <li>Sunday: Closed</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      <Script src="/chat-widget.js" strategy="afterInteractive" />
     </main>
   );
 }
